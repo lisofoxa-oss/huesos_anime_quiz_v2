@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>АНИМЕ-КВИЗ ДЛЯ ЁБАНЫХ ДЕГЕНЕРАТОВ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Roboto+Mono:wght@400;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --blood: #8B0000;
+    --dark: #0a0a0a;
+    --darker: #050505;
+    --gray: #1a1a1a;
+    --light: #e0e0e0;
+    --accent: #ff3333;
+    --gold: #ffaa00;
+    --green: #00ff66;
+}
+
+body {
+    font-family: 'Oswald', sans-serif;
+    background: var(--darker);
+    color: var(--light);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Animated background */
+.bg-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(139, 0, 0, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 0, 0, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.bg-vignette {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, transparent 0%, var(--darker) 80%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.container {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    padding: 30px 0;
+    border-bottom: 2px solid var(--blood);
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
+    animation: pulse 2s infinite;
+}
+
+.header p {
+    font-family: 'Roboto Mono', monospace;
+    color: #666;
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+@keyframes pulse {
+    0%, 100% { text-shadow: 0 0 20px rgba(255, 51, 51, 0.5); }
+    50% { text-shadow: 0 0 40px rgba(255, 51, 51, 0.8); }
+}
+
+/* Screens */
+.screen {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    animation: fadeIn 0.5s ease;
+}
+
+.screen.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Difficulty selection */
+.difficulty-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.diff-card {
+    background: var(--gray);
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.diff-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transition: left 0.5s;
+}
+
+.diff-card:hover::before {
+    left: 100%;
+}
+
+.diff-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent);
+    box-shadow: 0 10px 30px rgba(139, 0, 0, 0.3);
+}
+
+.diff-card.easy { border-color: #00aa44; }
+.diff-card.easy:hover { box-shadow: 0 10px 30px rgba(0, 170, 68, 0.3); }
+.diff-card.medium { border-color: var(--gold); }
+.diff-card.medium:hover { box-shadow: 0 10px 30px rgba(255, 170, 0, 0.3); }
+.diff-card.hard { border-color: var(--accent); }
+.diff-card.hard:hover { box-shadow: 0 10px 30px rgba(255, 51, 51, 0.4); }
+
+.diff-card h3 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.diff-card.easy h3 { color: #00dd55; }
+.diff-card.medium h3 { color: var(--gold); }
+.diff-card.hard h3 { color: var(--accent); }
+
+.diff-card p {
+    font-family: 'Roboto Mono', monospace;
+    color: #888;
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+.diff-card .count {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 5px 15px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: #aaa;
+}
+
+/* Game UI */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px 20px;
+    background: var(--gray);
+    border-radius: 10px;
+    border: 1px solid #333;
+}
+
+.game-header .stat {
+    text-align: center;
+}
+
+.game-header .stat-label {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.7rem;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.game-header .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.timer-bar {
+    width: 100%;
+    height: 6px;
+    background: #222;
+    border-radius: 3px;
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.timer-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), var(--gold), var(--accent));
+    border-radius: 3px;
+    transition: width 0.1s linear;
+}
+
+.progress-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #333;
+    transition: all 0.3s;
+}
+
+.dot.correct { background: var(--green); box-shadow: 0 0 10px var(--green); }
+.dot.wrong { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.dot.current { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+
+/* Question */
+.question-card {
+    background: var(--gray);
+    border: 1px solid #333;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.question-number {
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: var(--blood);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.question-text {
+    font-size: 1.3rem;
+    line-height: 1.7;
+    color: #ddd;
+    margin-top: 10px;
+}
+
+/* Answers */
+.answers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.answer-btn {
+    background: var(--gray);
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 20px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.1rem;
+    color: var(--light);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+}
+
+.answer-btn:hover:not(.disabled) {
+    border-color: var(--accent);
+    background: #222;
+    transform: scale(1.02);
+}
+
+.answer-btn.correct {
+    border-color: var(--green);
+    background: rgba(0, 255, 102, 0.1);
+    animation: correctPulse 0.5s;
+}
+
+.answer-btn.wrong {
+    border-color: var(--accent);
+    background: rgba(255, 51, 51, 0.1);
+    animation: shake 0.5s;
+}
+
+.answer-btn.disabled {
+    cursor: default;
+    opacity: 0.7;
+}
+
+@keyframes correctPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-10px); }
+    80% { transform: translateX(10px); }
+}
+
+/* Feedback */
+.feedback {
+    text-align: center;
+    padding: 20px;
+    margin-top: 15px;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    animation: fadeIn 0.3s;
+}
+
+.feedback.correct {
+    background: rgba(0, 255, 102, 0.1);
+    color: var(--green);
+    border: 1px solid var(--green);
+}
+
+.feedback.wrong {
+    background: rgba(255, 51, 51, 0.1);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+}
+
+/* Results */
+.results-card {
+    background: var(--gray);
+    border: 2px solid var(--blood);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+}
+
+.results-score {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-shadow: 0 0 30px rgba(255, 51, 51, 0.5);
+    margin: 20px 0;
+}
+
+.results-title {
+    font-size: 2rem;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.results-desc {
+    font-family: 'Roboto Mono', monospace;
+    color: #888;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.stat-box {
+    background: var(--darker);
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.stat-box-label {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.stat-box-bar {
+    width: 100%;
+    height: 8px;
+    background: #222;
+    border-radius: 4px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.stat-box-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease;
+}
+
+.stat-box-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-top: 5px;
+}
+
+/* Radar chart container */
+.radar-container {
+    margin: 30px auto;
+    width: 300px;
+    height: 300px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 15px 40px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: 2px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 20px;
+}
+
+.btn:hover {
+    background: var(--accent);
+    color: var(--dark);
+    box-shadow: 0 0 30px rgba(255, 51, 51, 0.4);
+}
+
+/* Loading */
+.loading {
+    text-align: center;
+    padding: 50px;
+}
+
+.loading-text {
+    font-size: 1.5rem;
+    color: var(--accent);
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .header h1 { font-size: 1.8rem; }
+    .answers-grid { grid-template-columns: 1fr; }
+    .results-score { font-size: 2.5rem; }
+    .game-header { flex-wrap: wrap; gap: 10px; }
+    .difficulty-grid { grid-template-columns: 1fr; }
+}
+
+/* Particle effect for correct answers */
+.particle {
+    position: fixed;
+    pointer-events: none;
+    width: 6px;
+    height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: particleFly 1s ease-out forwards;
+}
+
+@keyframes particleFly {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-vignette"></div>
+
+<div class="container">
+    <div class="header">
+        <h1>🔥 АНИМЕ-КВИЗ 🔥</h1>
+        <p>Угадай тайтл по описанию, сука</p>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="screen active" id="screen-loading">
+        <div class="loading">
+            <div class="loading-text">ЗАГРУЖАЮ БАЗУ ДАННЫХ...</div>
+            <p style="color:#555; margin-top:20px; font-family:Roboto Mono">Пиздец какой-то идёт</p>
+        </div>
+    </div>
+
+    <!-- Menu Screen -->
+    <div class="screen" id="screen-menu">
+        <div style="text-align:center; margin-bottom:20px;">
+            <h2 style="font-size:2rem; text-transform:uppercase; margin-bottom:10px;">Выбери сложность, пёс</h2>
+            <p style="color:#666; font-family:Roboto Mono">Чем выше уровень — тем меньше популярных тайтлов и больше мозголомства</p>
+        </div>
+        <div class="difficulty-grid">
+            <div class="diff-card easy" onclick="startGame('easy')">
+                <h3>🟢 ЛЁГКИЙ</h3>
+                <p>Только самые заезженные тайтлы. Наруто, Атака титанов, Тетрадь смерти — если не угадаешь, то ты вообще не смотрел аниме.</p>
+                <span class="count" id="count-easy">0 тайтлов</span>
+            </div>
+            <div class="diff-card medium" onclick="startGame('medium')">
+                <h3>🟡 СРЕДНИЙ</h3>
+                <p>Менее очевидные штуки. Берсерк, Монстр, Винланд Сага — для тех, кто смотрел больше, чем топы на ютубе.</p>
+                <span class="count" id="count-medium">0 тайтлов</span>
+            </div>
+            <div class="diff-card hard" onclick="startGame('hard')">
+                <h3>🔴 СЛОЖНЫЙ</h3>
+                <p>Нишевое говно для избранных. Лэйн, Текснолайз, Эрго Прокси — если угадаешь хоть половину, ты либо ебанутый, либо старпёр.</p>
+                <span class="count" id="count-hard">0 тайтлов</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div class="screen" id="screen-game">
+        <div class="game-header">
+            <div class="stat">
+                <div class="stat-label">Вопрос</div>
+                <div class="stat-value"><span id="current-q">1</span>/10</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Очки</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Жизни</div>
+                <div class="stat-value" id="lives">❤️❤️❤️</div>
+            </div>
+        </div>
+
+        <div class="timer-bar">
+            <div class="timer-fill" id="timer-fill" style="width:100%"></div>
+        </div>
+
+        <div class="progress-dots" id="progress-dots"></div>
+
+        <div class="question-card">
+            <div class="question-number">ВОПРОС <span id="q-num">1</span></div>
+            <div class="question-text" id="question-text">Загрузка...</div>
+        </div>
+
+        <div class="answers-grid" id="answers-grid"></div>
+
+        <div class="feedback" id="feedback" style="display:none"></div>
+    </div>
+
+    <!-- Results Screen -->
+    <div class="screen" id="screen-results">
+        <div class="results-card">
+            <div class="results-title" id="result-title">РЕЗУЛЬТАТ</div>
+            <div class="results-score" id="result-score">0</div>
+            <div class="results-desc" id="result-desc"></div>
+
+            <div class="radar-container">
+                <canvas id="radar-chart" width="300" height="300"></canvas>
+            </div>
+
+            <div class="stats-grid" id="stats-grid"></div>
+
+            <button class="btn" onclick="showMenu()">ЕЩЁ РАЗ, БЛЯДЬ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==================== DATA ====================
+let allData = { easy: [], medium: [], hard: [] };
+let currentDifficulty = 'easy';
+let questions = [];
+let currentQuestion = 0;
+let score = 0;
+let lives = 3;
+let timer = null;
+let timeLeft = 20;
+let answered = false;
+let gameStats = { violence: 0, ecchi: 0, plot_depth: 0, darkness: 0, hype: 0, mindfuck: 0, feels: 0 };
+let correctCount = 0;
+
+const STAT_LABELS = {
+    violence: 'Жестокость',
+    ecchi: 'Пошлость',
+    plot_depth: 'Глубина сюжета',
+    darkness: 'Мрачность',
+    hype: 'Популярность',
+    mindfuck: 'Мозголомность',
+    feels: 'Эмоциональность'
+};
+
+const CORRECT_PHRASES = [
+    'ЕБАТЬ, ТЫ УГАДАЛ!',
+    'ПРАВИЛЬНО, СУКА!',
+    'НЕ, НУ ТЫ РЕАЛЬНО ШАРИШЬ!',
+    'БЛЯ, А ТЫ НЕ ТАКОЙ УЁБОК!',
+    'В ЯБЛОЧКО, МУДИЛА!',
+    'КРАСАВА, ПЁС!',
+    'ТОЧНО В ЦЕЛЬ, ХУЕСОС!'
+];
+
+const WRONG_PHRASES = [
+    'ТЫ ЧЁ, ЕБАНУЛСЯ?',
+    'ДА ТЫ ПРОСТО ПИЗДЕЦ!',
+    'НЕТ, ДОЛБОЁБ!',
+    'КАКОГО ХУЯ, БЛЯДЬ?',
+    'ТЫ ВООБЩЕ СМОТРЕЛ АНИМЕ?',
+    'МОЗГ ВКЛЮЧИ, УЁБОК!',
+    'ПИЗДЕЦ ТЕБЕ, А НЕ АНИМЕ!'
+];
+
+// ==================== LOAD DATA ====================
+async function loadData() {
+    try {
+        const [easy, medium, hard] = await Promise.all([
+            fetch('data_easy.json').then(r => r.json()),
+            fetch('data_medium.json').then(r => r.json()),
+            fetch('data_hard.json').then(r => r.json())
+        ]);
+        allData.easy = easy;
+        allData.medium = medium;
+        allData.hard = hard;
+
+        document.getElementById('count-easy').textContent = easy.length + ' тайтлов';
+        document.getElementById('count-medium').textContent = medium.length + ' тайтлов';
+        document.getElementById('count-hard').textContent = hard.length + ' тайтлов';
+
+        showScreen('screen-menu');
+    } catch (e) {
+        document.querySelector('.loading-text').textContent = 'ОШИБКА ЗАГРУЗКИ, ПИЗДЕЦ';
+        document.querySelector('.loading p').textContent = 'Проверь, что JSON-файлы лежат рядом с HTML';
+    }
+}
+
+// ==================== GAME LOGIC ====================
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function startGame(difficulty) {
+    currentDifficulty = difficulty;
+    const pool = [...allData[difficulty]];
+    // Shuffle and pick 10
+    for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    questions = pool.slice(0, 10);
+    currentQuestion = 0;
+    score = 0;
+    lives = 3;
+    correctCount = 0;
+    gameStats = { violence: 0, ecchi: 0, plot_depth: 0, darkness: 0, hype: 0, mindfuck: 0, feels: 0 };
+
+    updateLives();
+    createProgressDots();
+    showScreen('screen-game');
+    showQuestion();
+}
+
+function createProgressDots() {
+    const container = document.getElementById('progress-dots');
+    container.innerHTML = '';
+    for (let i = 0; i < 10; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot' + (i === 0 ? ' current' : '');
+        dot.id = 'dot-' + i;
+        container.appendChild(dot);
+    }
+}
+
+function showQuestion() {
+    answered = false;
+    const q = questions[currentQuestion];
+    document.getElementById('current-q').textContent = currentQuestion + 1;
+    document.getElementById('q-num').textContent = currentQuestion + 1;
+    document.getElementById('question-text').textContent = q.description;
+    document.getElementById('score').textContent = score;
+    document.getElementById('feedback').style.display = 'none';
+
+    // Update dots
+    document.querySelectorAll('.dot').forEach((d, i) => {
+        d.classList.remove('current');
+        if (i === currentQuestion) d.classList.add('current');
+    });
+
+    // Create answers
+    const answers = [q.title, ...q.wrong];
+    // Shuffle answers
+    for (let i = answers.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [answers[i], answers[j]] = [answers[j], answers[i]];
+    }
+
+    const grid = document.getElementById('answers-grid');
+    grid.innerHTML = '';
+    answers.forEach(ans => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = ans;
+        btn.onclick = () => handleAnswer(ans, q.title, btn);
+        grid.appendChild(btn);
+    });
+
+    // Start timer
+    timeLeft = 20;
+    startTimer();
+}
+
+function startTimer() {
+    clearInterval(timer);
+    const fill = document.getElementById('timer-fill');
+    fill.style.width = '100%';
+    fill.style.transition = 'none';
+
+    setTimeout(() => {
+        fill.style.transition = 'width 20s linear';
+        fill.style.width = '0%';
+    }, 50);
+
+    timer = setInterval(() => {
+        timeLeft -= 0.1;
+        if (timeLeft <= 0 && !answered) {
+            clearInterval(timer);
+            handleTimeout();
+        }
+    }, 100);
+}
+
+function handleTimeout() {
+    if (answered) return;
+    answered = true;
+    const q = questions[currentQuestion];
+    const buttons = document.querySelectorAll('.answer-btn');
+    buttons.forEach(btn => {
+        btn.classList.add('disabled');
+        if (btn.textContent === q.title) {
+            btn.classList.add('correct');
+        }
+    });
+
+    lives--;
+    updateLives();
+    showFeedback(false, 'ВРЕМЯ ВЫШЛО, ТУПИЦА!');
+
+    if (lives <= 0) {
+        setTimeout(endGame, 2000);
+    } else {
+        setTimeout(nextQuestion, 2000);
+    }
+}
+
+function handleAnswer(selected, correct, btn) {
+    if (answered) return;
+    answered = true;
+    clearInterval(timer);
+
+    const buttons = document.querySelectorAll('.answer-btn');
+    buttons.forEach(b => b.classList.add('disabled'));
+
+    const isCorrect = selected === correct;
+    const q = questions[currentQuestion];
+
+    if (isCorrect) {
+        btn.classList.add('correct');
+        correctCount++;
+        const timeBonus = Math.floor(timeLeft * 5);
+        score += 100 + timeBonus;
+
+        // Add stats
+        for (let key in gameStats) {
+            gameStats[key] += q.stats[key];
+        }
+
+        // Particles
+        createParticles(btn);
+        showFeedback(true, CORRECT_PHRASES[Math.floor(Math.random() * CORRECT_PHRASES.length)]);
+        document.getElementById('dot-' + currentQuestion).classList.add('correct');
+    } else {
+        btn.classList.add('wrong');
+        buttons.forEach(b => {
+            if (b.textContent === correct) b.classList.add('correct');
+        });
+        lives--;
+        updateLives();
+        showFeedback(false, WRONG_PHRASES[Math.floor(Math.random() * WRONG_PHRASES.length)]);
+        document.getElementById('dot-' + currentQuestion).classList.add('wrong');
+    }
+
+    if (lives <= 0) {
+        setTimeout(endGame, 2000);
+    } else if (currentQuestion >= 9) {
+        setTimeout(endGame, 2000);
+    } else {
+        setTimeout(nextQuestion, 2000);
+    }
+}
+
+function showFeedback(isCorrect, text) {
+    const fb = document.getElementById('feedback');
+    fb.textContent = text;
+    fb.className = 'feedback ' + (isCorrect ? 'correct' : 'wrong');
+    fb.style.display = 'block';
+}
+
+function updateLives() {
+    let hearts = '';
+    for (let i = 0; i < lives; i++) hearts += '❤️';
+    for (let i = lives; i < 3; i++) hearts += '🖤';
+    document.getElementById('lives').textContent = hearts;
+}
+
+function nextQuestion() {
+    currentQuestion++;
+    showQuestion();
+}
+
+function endGame() {
+    showScreen('screen-results');
+    const percentage = Math.round((correctCount / 10) * 100);
+    document.getElementById('result-score').textContent = score + ' ОЧКОВ';
+
+    let title, desc;
+    if (percentage === 100) {
+        title = 'ТЫ ЕБАНУТЫЙ';
+        desc = '100% правильных ответов. Либо ты реально смотрел всё подряд, либо ты просто задрот без жизни. В любом случае — уважение, пёс.';
+    } else if (percentage >= 80) {
+        title = 'РЕАЛЬНО ШАРИШЬ';
+        desc = percentage + '% — это пиздец как круто. Ты либо старожил аниме, либо у тебя нет друзей. Или и то, и другое.';
+    } else if (percentage >= 60) {
+        title = 'НЕПЛОХО, ЧУВАК';
+        desc = percentage + '% — норм результат. Знаешь основу, но есть куда расти. Или не расти, похуй.';
+    } else if (percentage >= 40) {
+        title = 'ТАК СЕБЕ';
+        desc = percentage + '% — ну бля, ты хотя бы пытался. Смотри больше аниме, меньше тиктока, и всё будет заебись.';
+    } else if (percentage >= 20) {
+        title = 'ПИЗДЕЦ ТЕБЕ';
+        desc = percentage + '% — это просто позор. Ты смотрел аниме или просто картинки в пинтересте листал?';
+    } else {
+        title = 'ТЫ ПОЛНЫЙ НУЛЬ';
+        desc = percentage + '% — иди смотри Наруто, блядь. Это база, которую должен знать каждый, кто хоть раз открывал Crunchyroll.';
+    }
+    document.getElementById('result-title').textContent = title;
+    document.getElementById('result-desc').textContent = desc;
+
+    // Calculate average stats
+    const avgStats = {};
+    const statCount = correctCount > 0 ? correctCount : 1;
+    for (let key in gameStats) {
+        avgStats[key] = Math.round(gameStats[key] / statCount);
+    }
+
+    // Show stat bars
+    const statsGrid = document.getElementById('stats-grid');
+    statsGrid.innerHTML = '';
+    const colors = ['#ff3333', '#ff66cc', '#3366ff', '#6633ff', '#ffaa00', '#00ff66', '#00ccff'];
+    let i = 0;
+    for (let key in avgStats) {
+        const box = document.createElement('div');
+        box.className = 'stat-box';
+        box.innerHTML = `
+            <div class="stat-box-label">${STAT_LABELS[key]}</div>
+            <div class="stat-box-bar"><div class="stat-box-fill" style="width:0%; background:${colors[i % colors.length]}"></div></div>
+            <div class="stat-box-value" style="color:${colors[i % colors.length]}">${avgStats[key]}/10</div>
+        `;
+        statsGrid.appendChild(box);
+        setTimeout(() => {
+            box.querySelector('.stat-box-fill').style.width = (avgStats[key] * 10) + '%';
+        }, 100 + i * 100);
+        i++;
+    }
+
+    // Draw radar chart
+    drawRadarChart(avgStats);
+}
+
+function drawRadarChart(stats) {
+    const canvas = document.getElementById('radar-chart');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width;
+    const h = canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+    const radius = 100;
+
+    ctx.clearRect(0, 0, w, h);
+
+    const keys = Object.keys(stats);
+    const count = keys.length;
+    const angleStep = (Math.PI * 2) / count;
+
+    // Draw grid
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1;
+    for (let r = 2; r <= 10; r += 2) {
+        ctx.beginPath();
+        for (let i = 0; i < count; i++) {
+            const angle = i * angleStep - Math.PI / 2;
+            const x = cx + Math.cos(angle) * (radius * r / 10);
+            const y = cy + Math.sin(angle) * (radius * r / 10);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+    }
+
+    // Draw axes
+    for (let i = 0; i < count; i++) {
+        const angle = i * angleStep - Math.PI / 2;
+        const x = cx + Math.cos(angle) * radius;
+        const y = cy + Math.sin(angle) * radius;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        // Labels
+        const labelX = cx + Math.cos(angle) * (radius + 25);
+        const labelY = cy + Math.sin(angle) * (radius + 25);
+        ctx.fillStyle = '#888';
+        ctx.font = '10px Roboto Mono';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(STAT_LABELS[keys[i]], labelX, labelY);
+    }
+
+    // Draw data
+    ctx.beginPath();
+    for (let i = 0; i < count; i++) {
+        const angle = i * angleStep - Math.PI / 2;
+        const val = stats[keys[i]];
+        const x = cx + Math.cos(angle) * (radius * val / 10);
+        const y = cy + Math.sin(angle) * (radius * val / 10);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(255, 51, 51, 0.3)';
+    ctx.fill();
+    ctx.strokeStyle = '#ff3333';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Draw points
+    for (let i = 0; i < count; i++) {
+        const angle = i * angleStep - Math.PI / 2;
+        const val = stats[keys[i]];
+        const x = cx + Math.cos(angle) * (radius * val / 10);
+        const y = cy + Math.sin(angle) * (radius * val / 10);
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff3333';
+        ctx.fill();
+    }
+}
+
+function createParticles(element) {
+    const rect = element.getBoundingClientRect();
+    for (let i = 0; i < 15; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = (rect.left + rect.width / 2) + 'px';
+        p.style.top = (rect.top + rect.height / 2) + 'px';
+        p.style.setProperty('--tx', (Math.random() - 0.5) * 200 + 'px');
+        p.style.setProperty('--ty', (Math.random() - 0.5) * 200 + 'px');
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 1000);
+    }
+}
+
+function showMenu() {
+    showScreen('screen-menu');
+}
+
+// Init
+loadData();
+</script>
+</body>
+</html>
