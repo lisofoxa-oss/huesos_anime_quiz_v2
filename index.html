@@ -22,6 +22,8 @@
     --accent: #ff3333;
     --gold: #ffaa00;
     --green: #00ff66;
+    --blue: #3366ff;
+    --pink: #ff66cc;
 }
 
 body {
@@ -115,6 +117,86 @@ body {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* Gender selection */
+.gender-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.gender-card {
+    background: var(--gray);
+    border: 3px solid #333;
+    border-radius: 20px;
+    padding: 50px 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.gender-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transition: left 0.5s;
+}
+
+.gender-card:hover::before {
+    left: 100%;
+}
+
+.gender-card:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+.gender-card.male {
+    border-color: var(--blue);
+}
+.gender-card.male:hover {
+    box-shadow: 0 15px 40px rgba(51, 102, 255, 0.3);
+    border-color: #5588ff;
+}
+.gender-card.male .gender-icon {
+    font-size: 5rem;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 20px rgba(51,102,255,0.5));
+}
+.gender-card.male h3 {
+    color: var(--blue);
+    font-size: 2.2rem;
+}
+
+.gender-card.female {
+    border-color: var(--pink);
+}
+.gender-card.female:hover {
+    box-shadow: 0 15px 40px rgba(255, 102, 204, 0.3);
+    border-color: #ff88dd;
+}
+.gender-card.female .gender-icon {
+    font-size: 5rem;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 20px rgba(255,102,204,0.5));
+}
+.gender-card.female h3 {
+    color: var(--pink);
+    font-size: 2.2rem;
+}
+
+.gender-card p {
+    font-family: 'Roboto Mono', monospace;
+    color: #888;
+    margin-top: 10px;
+    font-size: 0.9rem;
 }
 
 /* Difficulty selection */
@@ -496,6 +578,7 @@ body {
     .results-score { font-size: 2.5rem; }
     .game-header { flex-wrap: wrap; gap: 10px; }
     .difficulty-grid { grid-template-columns: 1fr; }
+    .gender-grid { grid-template-columns: 1fr; }
 }
 
 /* Particle effect for correct answers */
@@ -522,22 +605,42 @@ body {
 <div class="container">
     <div class="header">
         <h1>🔥 АНИМЕ-КВИЗ 🔥</h1>
-        <p>Угадай тайтл по описанию, сука</p>
+        <p id="header-subtitle">Загрузка...</p>
     </div>
 
     <!-- Loading Screen -->
     <div class="screen active" id="screen-loading">
         <div class="loading">
-            <div class="loading-text">ЗАГРУЖАЮ БАЗУ ДАННЫХ...</div>
-            <p style="color:#555; margin-top:20px; font-family:Roboto Mono">Пиздец какой-то идёт</p>
+            <div class="loading-text" id="loading-text">ЗАГРУЖАЮ БАЗУ ДАННЫХ...</div>
+            <p style="color:#555; margin-top:20px; font-family:Roboto Mono" id="loading-sub">Пиздец какой-то идёт</p>
+        </div>
+    </div>
+
+    <!-- Gender Selection Screen -->
+    <div class="screen" id="screen-gender">
+        <div style="text-align:center; margin-bottom:20px;">
+            <h2 style="font-size:2rem; text-transform:uppercase; margin-bottom:10px;" id="gender-title">КТО ТЫ, ЁБАНЫЙ?</h2>
+            <p style="color:#666; font-family:Roboto Mono" id="gender-sub">От этого зависит, как я буду с тобой разговаривать</p>
+        </div>
+        <div class="gender-grid">
+            <div class="gender-card male" onclick="setGender('male')">
+                <div class="gender-icon">♂️</div>
+                <h3 id="gender-male-label">ПАЦАН</h3>
+                <p>Буду обращаться как к братану. Матерно, брутально, по-мужски.</p>
+            </div>
+            <div class="gender-card female" onclick="setGender('female')">
+                <div class="gender-icon">♀️</div>
+                <h3 id="gender-female-label">ДЕВЧОНКА</h3>
+                <p>Буду обращаться как к крошке. Матерно, но с изюминкой.</p>
+            </div>
         </div>
     </div>
 
     <!-- Menu Screen -->
     <div class="screen" id="screen-menu">
         <div style="text-align:center; margin-bottom:20px;">
-            <h2 style="font-size:2rem; text-transform:uppercase; margin-bottom:10px;">Выбери сложность, пёс</h2>
-            <p style="color:#666; font-family:Roboto Mono">Чем выше уровень — тем меньше популярных тайтлов и больше мозголомства</p>
+            <h2 style="font-size:2rem; text-transform:uppercase; margin-bottom:10px;" id="menu-title">Выбери сложность, пёс</h2>
+            <p style="color:#666; font-family:Roboto Mono" id="menu-sub">Чем выше уровень — тем меньше популярных тайтлов и больше мозголомства</p>
         </div>
         <div class="difficulty-grid">
             <div class="diff-card easy" onclick="startGame('easy')">
@@ -562,15 +665,15 @@ body {
     <div class="screen" id="screen-game">
         <div class="game-header">
             <div class="stat">
-                <div class="stat-label">Вопрос</div>
+                <div class="stat-label" id="stat-q-label">Вопрос</div>
                 <div class="stat-value"><span id="current-q">1</span>/10</div>
             </div>
             <div class="stat">
-                <div class="stat-label">Очки</div>
+                <div class="stat-label" id="stat-score-label">Очки</div>
                 <div class="stat-value" id="score">0</div>
             </div>
             <div class="stat">
-                <div class="stat-label">Жизни</div>
+                <div class="stat-label" id="stat-lives-label">Жизни</div>
                 <div class="stat-value" id="lives">❤️❤️❤️</div>
             </div>
         </div>
@@ -582,7 +685,7 @@ body {
         <div class="progress-dots" id="progress-dots"></div>
 
         <div class="question-card">
-            <div class="question-number">ВОПРОС <span id="q-num">1</span></div>
+            <div class="question-number"><span id="q-label">ВОПРОС</span> <span id="q-num">1</span></div>
             <div class="question-text" id="question-text">Загрузка...</div>
         </div>
 
@@ -604,7 +707,7 @@ body {
 
             <div class="stats-grid" id="stats-grid"></div>
 
-            <button class="btn" onclick="showMenu()">ЕЩЁ РАЗ, БЛЯДЬ</button>
+            <button class="btn" onclick="showMenu()" id="again-btn">ЕЩЁ РАЗ, БЛЯДЬ</button>
         </div>
     </div>
 </div>
@@ -612,6 +715,8 @@ body {
 <script>
 // ==================== DATA ====================
 let allData = { easy: [], medium: [], hard: [] };
+let phrases = { male: {}, female: {} };
+let currentGender = 'male';
 let currentDifficulty = 'easy';
 let questions = [];
 let currentQuestion = 0;
@@ -633,47 +738,53 @@ const STAT_LABELS = {
     feels: 'Эмоциональность'
 };
 
-const CORRECT_PHRASES = [
-    'ЕБАТЬ, ТЫ УГАДАЛ!',
-    'ПРАВИЛЬНО, СУКА!',
-    'НЕ, НУ ТЫ РЕАЛЬНО ШАРИШЬ!',
-    'БЛЯ, А ТЫ НЕ ТАКОЙ УЁБОК!',
-    'В ЯБЛОЧКО, МУДИЛА!',
-    'КРАСАВА, ПЁС!',
-    'ТОЧНО В ЦЕЛЬ, ХУЕСОС!'
-];
-
-const WRONG_PHRASES = [
-    'ТЫ ЧЁ, ЕБАНУЛСЯ?',
-    'ДА ТЫ ПРОСТО ПИЗДЕЦ!',
-    'НЕТ, ДОЛБОЁБ!',
-    'КАКОГО ХУЯ, БЛЯДЬ?',
-    'ТЫ ВООБЩЕ СМОТРЕЛ АНИМЕ?',
-    'МОЗГ ВКЛЮЧИ, УЁБОК!',
-    'ПИЗДЕЦ ТЕБЕ, А НЕ АНИМЕ!'
-];
+function P(key) {
+    return phrases[currentGender][key] || key;
+}
 
 // ==================== LOAD DATA ====================
 async function loadData() {
     try {
-        const [easy, medium, hard] = await Promise.all([
+        const [easy, medium, hard, phr] = await Promise.all([
             fetch('data_easy.json').then(r => r.json()),
             fetch('data_medium.json').then(r => r.json()),
-            fetch('data_hard.json').then(r => r.json())
+            fetch('data_hard.json').then(r => r.json()),
+            fetch('phrases.json').then(r => r.json())
         ]);
         allData.easy = easy;
         allData.medium = medium;
         allData.hard = hard;
+        phrases = phr;
 
         document.getElementById('count-easy').textContent = easy.length + ' тайтлов';
         document.getElementById('count-medium').textContent = medium.length + ' тайтлов';
         document.getElementById('count-hard').textContent = hard.length + ' тайтлов';
 
-        showScreen('screen-menu');
+        showScreen('screen-gender');
     } catch (e) {
-        document.querySelector('.loading-text').textContent = 'ОШИБКА ЗАГРУЗКИ, ПИЗДЕЦ';
-        document.querySelector('.loading p').textContent = 'Проверь, что JSON-файлы лежат рядом с HTML';
+        document.getElementById('loading-text').textContent = 'ОШИБКА ЗАГРУЗКИ, ПИЗДЕЦ';
+        document.getElementById('loading-sub').textContent = 'Проверь, что JSON-файлы лежат рядом с HTML';
     }
+}
+
+// ==================== GENDER SELECT ====================
+function setGender(gender) {
+    currentGender = gender;
+    // Update static texts
+    document.getElementById('header-subtitle').textContent = P('subtitle');
+    document.getElementById('gender-title').textContent = P('gender_select_title');
+    document.getElementById('gender-sub').textContent = P('gender_select_sub');
+    document.getElementById('gender-male-label').textContent = P('gender_male');
+    document.getElementById('gender-female-label').textContent = P('gender_female');
+    document.getElementById('menu-title').textContent = P('choose_difficulty');
+    document.getElementById('menu-sub').textContent = P('choose_difficulty_sub');
+    document.getElementById('stat-q-label').textContent = P('stat_question');
+    document.getElementById('stat-score-label').textContent = P('stat_score');
+    document.getElementById('stat-lives-label').textContent = P('stat_lives');
+    document.getElementById('q-label').textContent = P('question_label');
+    document.getElementById('result-title').textContent = P('results_title');
+    document.getElementById('again-btn').textContent = P('again_btn');
+    showScreen('screen-menu');
 }
 
 // ==================== GAME LOGIC ====================
@@ -685,7 +796,6 @@ function showScreen(id) {
 function startGame(difficulty) {
     currentDifficulty = difficulty;
     const pool = [...allData[difficulty]];
-    // Shuffle and pick 10
     for (let i = pool.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -723,15 +833,12 @@ function showQuestion() {
     document.getElementById('score').textContent = score;
     document.getElementById('feedback').style.display = 'none';
 
-    // Update dots
     document.querySelectorAll('.dot').forEach((d, i) => {
         d.classList.remove('current');
         if (i === currentQuestion) d.classList.add('current');
     });
 
-    // Create answers
     const answers = [q.title, ...q.wrong];
-    // Shuffle answers
     for (let i = answers.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [answers[i], answers[j]] = [answers[j], answers[i]];
@@ -747,7 +854,6 @@ function showQuestion() {
         grid.appendChild(btn);
     });
 
-    // Start timer
     timeLeft = 20;
     startTimer();
 }
@@ -786,7 +892,7 @@ function handleTimeout() {
 
     lives--;
     updateLives();
-    showFeedback(false, 'ВРЕМЯ ВЫШЛО, ТУПИЦА!');
+    showFeedback(false, P('timeout'));
 
     if (lives <= 0) {
         setTimeout(endGame, 2000);
@@ -805,6 +911,8 @@ function handleAnswer(selected, correct, btn) {
 
     const isCorrect = selected === correct;
     const q = questions[currentQuestion];
+    const correctPhrases = P('correct_phrases');
+    const wrongPhrases = P('wrong_phrases');
 
     if (isCorrect) {
         btn.classList.add('correct');
@@ -812,14 +920,14 @@ function handleAnswer(selected, correct, btn) {
         const timeBonus = Math.floor(timeLeft * 5);
         score += 100 + timeBonus;
 
-        // Add stats
         for (let key in gameStats) {
             gameStats[key] += q.stats[key];
         }
 
-        // Particles
         createParticles(btn);
-        showFeedback(true, CORRECT_PHRASES[Math.floor(Math.random() * CORRECT_PHRASES.length)]);
+        const phrasesList = Array.isArray(correctPhrases) ? correctPhrases : [];
+        const phrase = phrasesList.length > 0 ? phrasesList[Math.floor(Math.random() * phrasesList.length)] : 'ПРАВИЛЬНО!';
+        showFeedback(true, phrase);
         document.getElementById('dot-' + currentQuestion).classList.add('correct');
     } else {
         btn.classList.add('wrong');
@@ -828,7 +936,9 @@ function handleAnswer(selected, correct, btn) {
         });
         lives--;
         updateLives();
-        showFeedback(false, WRONG_PHRASES[Math.floor(Math.random() * WRONG_PHRASES.length)]);
+        const phrasesList = Array.isArray(wrongPhrases) ? wrongPhrases : [];
+        const phrase = phrasesList.length > 0 ? phrasesList[Math.floor(Math.random() * phrasesList.length)] : 'НЕПРАВИЛЬНО!';
+        showFeedback(false, phrase);
         document.getElementById('dot-' + currentQuestion).classList.add('wrong');
     }
 
@@ -865,37 +975,39 @@ function endGame() {
     const percentage = Math.round((correctCount / 10) * 100);
     document.getElementById('result-score').textContent = score + ' ОЧКОВ';
 
-    let title, desc;
+    let titleKey, descKey;
     if (percentage === 100) {
-        title = 'ТЫ ЕБАНУТЫЙ';
-        desc = '100% правильных ответов. Либо ты реально смотрел всё подряд, либо ты просто задрот без жизни. В любом случае — уважение, пёс.';
+        titleKey = 'result_100_title';
+        descKey = 'result_100_desc';
     } else if (percentage >= 80) {
-        title = 'РЕАЛЬНО ШАРИШЬ';
-        desc = percentage + '% — это пиздец как круто. Ты либо старожил аниме, либо у тебя нет друзей. Или и то, и другое.';
+        titleKey = 'result_80_title';
+        descKey = 'result_80_desc';
     } else if (percentage >= 60) {
-        title = 'НЕПЛОХО, ЧУВАК';
-        desc = percentage + '% — норм результат. Знаешь основу, но есть куда расти. Или не расти, похуй.';
+        titleKey = 'result_60_title';
+        descKey = 'result_60_desc';
     } else if (percentage >= 40) {
-        title = 'ТАК СЕБЕ';
-        desc = percentage + '% — ну бля, ты хотя бы пытался. Смотри больше аниме, меньше тиктока, и всё будет заебись.';
+        titleKey = 'result_40_title';
+        descKey = 'result_40_desc';
     } else if (percentage >= 20) {
-        title = 'ПИЗДЕЦ ТЕБЕ';
-        desc = percentage + '% — это просто позор. Ты смотрел аниме или просто картинки в пинтересте листал?';
+        titleKey = 'result_20_title';
+        descKey = 'result_20_desc';
     } else {
-        title = 'ТЫ ПОЛНЫЙ НУЛЬ';
-        desc = percentage + '% — иди смотри Наруто, блядь. Это база, которую должен знать каждый, кто хоть раз открывал Crunchyroll.';
+        titleKey = 'result_0_title';
+        descKey = 'result_0_desc';
     }
+
+    let title = P(titleKey);
+    let desc = P(descKey).replace('{pct}', percentage);
+
     document.getElementById('result-title').textContent = title;
     document.getElementById('result-desc').textContent = desc;
 
-    // Calculate average stats
     const avgStats = {};
     const statCount = correctCount > 0 ? correctCount : 1;
     for (let key in gameStats) {
         avgStats[key] = Math.round(gameStats[key] / statCount);
     }
 
-    // Show stat bars
     const statsGrid = document.getElementById('stats-grid');
     statsGrid.innerHTML = '';
     const colors = ['#ff3333', '#ff66cc', '#3366ff', '#6633ff', '#ffaa00', '#00ff66', '#00ccff'];
@@ -915,7 +1027,6 @@ function endGame() {
         i++;
     }
 
-    // Draw radar chart
     drawRadarChart(avgStats);
 }
 
@@ -934,7 +1045,6 @@ function drawRadarChart(stats) {
     const count = keys.length;
     const angleStep = (Math.PI * 2) / count;
 
-    // Draw grid
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 1;
     for (let r = 2; r <= 10; r += 2) {
@@ -950,7 +1060,6 @@ function drawRadarChart(stats) {
         ctx.stroke();
     }
 
-    // Draw axes
     for (let i = 0; i < count; i++) {
         const angle = i * angleStep - Math.PI / 2;
         const x = cx + Math.cos(angle) * radius;
@@ -960,7 +1069,6 @@ function drawRadarChart(stats) {
         ctx.lineTo(x, y);
         ctx.stroke();
 
-        // Labels
         const labelX = cx + Math.cos(angle) * (radius + 25);
         const labelY = cy + Math.sin(angle) * (radius + 25);
         ctx.fillStyle = '#888';
@@ -970,7 +1078,6 @@ function drawRadarChart(stats) {
         ctx.fillText(STAT_LABELS[keys[i]], labelX, labelY);
     }
 
-    // Draw data
     ctx.beginPath();
     for (let i = 0; i < count; i++) {
         const angle = i * angleStep - Math.PI / 2;
@@ -987,7 +1094,6 @@ function drawRadarChart(stats) {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Draw points
     for (let i = 0; i < count; i++) {
         const angle = i * angleStep - Math.PI / 2;
         const val = stats[keys[i]];
