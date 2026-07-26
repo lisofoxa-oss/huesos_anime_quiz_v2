@@ -72,6 +72,7 @@ body {
     flex-direction: column;
 }
 
+/* Header */
 .header {
     text-align: center;
     padding: 30px 0;
@@ -101,11 +102,11 @@ body {
     50% { text-shadow: 0 0 40px rgba(255, 51, 51, 0.8); }
 }
 
+/* Screens */
 .screen {
     display: none;
     flex: 1;
     flex-direction: column;
-    justify-content: center;
     animation: fadeIn 0.5s ease;
 }
 
@@ -275,18 +276,86 @@ body {
     animation: fadeIn 0.3s;
 }
 
-/* Difficulty selection */
-.difficulty-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-top: 30px;
+/* ===== MENU LAYOUT ===== */
+.menu-section {
+    margin-bottom: 15px;
 }
 
+.menu-section-title {
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #555;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.menu-section-title::before,
+.menu-section-title::after {
+    content: '';
+    display: inline-block;
+    width: 40px;
+    height: 2px;
+    background: #333;
+    vertical-align: middle;
+    margin: 0 15px;
+}
+
+/* Main difficulty grid - 3 cards */
+.main-diff-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+/* Extra modes */
+.extra-block {
+    margin-top: 10px;
+}
+
+.extra-label {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.extra-label-text {
+    display: inline-block;
+    background: linear-gradient(90deg, var(--dino), var(--hentai));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    position: relative;
+    padding: 0 20px;
+}
+
+.extra-label-text::before,
+.extra-label-text::after {
+    content: '✦';
+    color: #444;
+    -webkit-text-fill-color: #444;
+    margin: 0 10px;
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
+.extra-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* Difficulty cards */
 .diff-card {
     background: var(--gray);
     border: 2px solid #333;
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 25px 20px;
     text-align: center;
     cursor: pointer;
@@ -326,7 +395,7 @@ body {
 .diff-card.hentai:hover { box-shadow: 0 10px 30px rgba(255, 0, 102, 0.4); }
 
 .diff-card h3 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     margin-bottom: 10px;
     text-transform: uppercase;
 }
@@ -340,7 +409,7 @@ body {
 .diff-card p {
     font-family: 'Roboto Mono', monospace;
     color: #888;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     line-height: 1.5;
 }
 
@@ -352,9 +421,43 @@ body {
     border-radius: 20px;
     font-size: 0.75rem;
     color: #aaa;
+    font-family: 'Roboto Mono', monospace;
 }
 
-/* Game UI */
+/* Extra cards are wider and have icon left */
+.extra-card {
+    display: flex;
+    align-items: center;
+    text-align: left;
+    padding: 22px 25px;
+    gap: 18px;
+}
+
+.extra-card .extra-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
+}
+
+.extra-card .extra-content {
+    flex: 1;
+}
+
+.extra-card .extra-content h3 {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+}
+
+.extra-card .extra-content p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.extra-card .count {
+    margin-top: 8px;
+}
+
+/* ===== GAME UI ===== */
 .game-header {
     display: flex;
     justify-content: space-between;
@@ -528,7 +631,7 @@ body {
     border: 1px solid var(--accent);
 }
 
-/* Results */
+/* ===== RESULTS ===== */
 .results-card {
     background: var(--gray);
     border: 2px solid var(--blood);
@@ -645,18 +748,25 @@ body {
     50% { opacity: 0.3; }
 }
 
-@media (max-width: 600px) {
-    .header h1 { font-size: 1.8rem; }
+/* ===== RESPONSIVE ===== */
+@media (max-width: 700px) {
+    .header h1 { font-size: 2rem; letter-spacing: 2px; }
+    .main-diff-grid { grid-template-columns: 1fr; }
+    .extra-grid { grid-template-columns: 1fr; }
+    .extra-card { flex-direction: column; text-align: center; padding: 25px 20px; }
+    .extra-card .extra-icon { font-size: 3rem; margin-bottom: 5px; }
     .answers-grid { grid-template-columns: 1fr; }
     .results-score { font-size: 2.5rem; }
     .game-header { flex-wrap: wrap; gap: 10px; }
-    .difficulty-grid { grid-template-columns: 1fr 1fr; }
     .gender-grid { grid-template-columns: 1fr; }
     .age-buttons { flex-direction: column; }
+    .menu-section-title::before, .menu-section-title::after { display: none; }
+    .menu-section-title { font-size: 1.1rem; }
 }
 
-@media (max-width: 400px) {
-    .difficulty-grid { grid-template-columns: 1fr; }
+@media (min-width: 701px) and (max-width: 850px) {
+    .main-diff-grid { grid-template-columns: repeat(3, 1fr); }
+    .extra-grid { grid-template-columns: 1fr 1fr; }
 }
 
 .particle {
@@ -731,35 +841,54 @@ body {
 
     <!-- Menu Screen -->
     <div class="screen" id="screen-menu">
-        <div style="text-align:center; margin-bottom:20px;">
+        <div style="text-align:center; margin-bottom:25px;">
             <h2 style="font-size:2rem; text-transform:uppercase; margin-bottom:10px;" id="menu-title">Выбери сложность, пёс</h2>
             <p style="color:#666; font-family:Roboto Mono" id="menu-sub">Чем выше уровень — тем меньше популярных тайтлов и больше мозголомства</p>
         </div>
-        <div class="difficulty-grid">
-            <div class="diff-card easy" onclick="startGame('easy')">
-                <h3>🟢 ЛЁГКИЙ</h3>
-                <p>Только самые заезженные тайтлы. Наруто, Атака титанов, Тетрадь смерти.</p>
-                <span class="count" id="count-easy">0 тайтлов</span>
+
+        <!-- Main difficulties -->
+        <div class="menu-section">
+            <div class="main-diff-grid">
+                <div class="diff-card easy" onclick="startGame('easy')">
+                    <h3>🟢 ЛЁГКИЙ</h3>
+                    <p>Только самые заезженные тайтлы. Наруто, Атака титанов, Тетрадь смерти.</p>
+                    <span class="count" id="count-easy">0 тайтлов</span>
+                </div>
+                <div class="diff-card medium" onclick="startGame('medium')">
+                    <h3>🟡 СРЕДНИЙ</h3>
+                    <p>Менее очевидные штуки. Берсерк, Монстр, Винланд Сага.</p>
+                    <span class="count" id="count-medium">0 тайтлов</span>
+                </div>
+                <div class="diff-card hard" onclick="startGame('hard')">
+                    <h3>🔴 СЛОЖНЫЙ</h3>
+                    <p>Нишевое говно для избранных. Лэйн, Текснолайз, Эрго Прокси.</p>
+                    <span class="count" id="count-hard">0 тайтлов</span>
+                </div>
             </div>
-            <div class="diff-card medium" onclick="startGame('medium')">
-                <h3>🟡 СРЕДНИЙ</h3>
-                <p>Менее очевидные штуки. Берсерк, Монстр, Винланд Сага.</p>
-                <span class="count" id="count-medium">0 тайтлов</span>
+        </div>
+
+        <!-- Extra modes -->
+        <div class="extra-block">
+            <div class="extra-label">
+                <span class="extra-label-text">ЭКСТРА-МОДЫ</span>
             </div>
-            <div class="diff-card hard" onclick="startGame('hard')">
-                <h3>🔴 СЛОЖНЫЙ</h3>
-                <p>Нишевое говно для избранных. Лэйн, Текснолайз, Эрго Прокси.</p>
-                <span class="count" id="count-hard">0 тайтлов</span>
-            </div>
-            <div class="diff-card dino" onclick="startGame('dino')">
-                <h3 id="dino-title">🦕 ДИНОЗАВР</h3>
-                <p id="dino-desc">Старьё из 80-90-х. Сейлор Мун, Покемоны, Гандам.</p>
-                <span class="count" id="count-dino">0 тайтлов</span>
-            </div>
-            <div class="diff-card hentai" onclick="showAgeCheck()">
-                <h3 id="hentai-title">🍆 ХЕНТАЙ</h3>
-                <p id="hentai-desc">Только для избранных дегенератов. Bible Black, Euphoria, Itadaki Seieki.</p>
-                <span class="count" id="count-hentai">0 тайтлов</span>
+            <div class="extra-grid">
+                <div class="diff-card dino extra-card" onclick="startGame('dino')">
+                    <div class="extra-icon">🦕</div>
+                    <div class="extra-content">
+                        <h3 id="dino-title">ДИНОЗАВР</h3>
+                        <p id="dino-desc">Старьё из 80-90-х. Сейлор Мун, Покемоны, Гандам — если ты это знаешь, тебе либо за 30, либо ты смотрел всё подряд с папиных кассет.</p>
+                        <span class="count" id="count-dino">0 тайтлов</span>
+                    </div>
+                </div>
+                <div class="diff-card hentai extra-card" onclick="showAgeCheck()">
+                    <div class="extra-icon">🍆</div>
+                    <div class="extra-content">
+                        <h3 id="hentai-title">ХЕНТАЙ</h3>
+                        <p id="hentai-desc">Только для избранных дегенератов. Bible Black, Euphoria, Itadaki Seieki — если ты это знаешь, у тебя либо проблемы, либо ты просто честный человек.</p>
+                        <span class="count" id="count-hentai">0 тайтлов</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -905,14 +1034,14 @@ function setGender(gender) {
     document.getElementById('result-title').textContent = P('results_title');
     document.getElementById('again-btn').textContent = P('again_btn');
 
-    const dinoCard = document.getElementById('dino-title');
-    if (dinoCard) dinoCard.textContent = '🦕 ' + P('dino_level_title');
+    const dinoTitle = document.getElementById('dino-title');
+    if (dinoTitle) dinoTitle.textContent = P('dino_level_title');
 
     const dinoDesc = document.getElementById('dino-desc');
     if (dinoDesc) dinoDesc.textContent = P('dino_level_desc');
 
     const hentaiTitle = document.getElementById('hentai-title');
-    if (hentaiTitle) hentaiTitle.textContent = '🍆 ' + P('hentai_level_title');
+    if (hentaiTitle) hentaiTitle.textContent = P('hentai_level_title');
 
     const hentaiDesc = document.getElementById('hentai-desc');
     if (hentaiDesc) hentaiDesc.textContent = P('hentai_level_desc');
@@ -949,7 +1078,6 @@ function showScreen(id) {
 function startGame(difficulty) {
     currentDifficulty = difficulty;
 
-    // Set stats based on mode
     if (difficulty === 'hentai') {
         STAT_LABELS = HENTAI_STATS;
     } else {
